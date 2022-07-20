@@ -1,3 +1,26 @@
+from tkinter import *
+import os
+import sys
+
+def resource_path(relative_path):
+	""" Get absolute path to resource, works for dev and for PyInstaller """
+	try:
+		# PyInstaller creates a temp folder and stores path in _MEIPASS
+		base_path = sys._MEIPASS
+	except AttributeError:
+		base_path = os.path.abspath(".")
+	return os.path.join(base_path, relative_path)
+
+
+if __name__ == '__main__':
+	root = Tk()
+	root.title("Hangman")
+	root.resizable(False, False)
+	root.geometry(f"500x500+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 250}")
+	root.iconbitmap()
+
+
+"""
 def upisivanje(x):
 	file = open("ploca.txt", "w", encoding="utf-8")
 	file.write("".join(x))
@@ -60,3 +83,4 @@ if broj_gresaka == 10:
 	print("Izgubili ste!")
 else:
 	print("Bravo, svaka čast!")
+"""
