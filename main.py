@@ -60,3 +60,4 @@ if broj_gresaka == 10:
 	print("Izgubili ste!")
 else:
 	print("Bravo, svaka čast!")
+# test
