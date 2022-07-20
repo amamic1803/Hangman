@@ -19,6 +19,16 @@ if __name__ == '__main__':
 	root.resizable(False, False)
 	root.geometry(f"500x500+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 250}")
 	root.iconbitmap(resource_path("hangman-icon.ico"))
+	root.config(background="#fffae6")
+
+	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), background="#fffae6", activebackground="#fffae6")
+	title.place(x=0, y=0, width=500, height=75)
+
+	en_lbl = Label(root, text="EN", font=("Helvetica", 12, "bold"), justify=CENTER, background="#fffae6", activebackground="#fffae6", highlightthickness=2, highlightcolor="black", highlightbackground="black")
+	en_lbl.place(x=430, y=0, width=35, height=25)
+
+	hr_lbl = Label(root, text="HR", font=("Helvetica", 12, "bold"), justify=CENTER, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	hr_lbl.place(x=465, y=0, width=35, height=25)
 
 	root.mainloop()
 
