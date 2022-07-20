@@ -2,6 +2,7 @@ from tkinter import *
 import os
 import sys
 
+
 def resource_path(relative_path):
 	""" Get absolute path to resource, works for dev and for PyInstaller """
 	try:
@@ -17,8 +18,9 @@ if __name__ == '__main__':
 	root.title("Hangman")
 	root.resizable(False, False)
 	root.geometry(f"500x500+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 250}")
-	root.iconbitmap()
+	root.iconbitmap(resource_path("hangman-icon.ico"))
 
+	root.mainloop()
 
 """
 def upisivanje(x):
