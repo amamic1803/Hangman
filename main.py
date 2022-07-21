@@ -55,6 +55,10 @@ if __name__ == '__main__':
 	root.iconbitmap(resource_path("images/hangman-icon.ico"))
 	root.config(background="#fffae6")
 
+	hangman_images = []
+	for i in range(1, 10):
+		hangman_images.append(PhotoImage(file=f"images//hangman_{i}.png"))
+
 	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), borderwidth=0, background="#fffae6", activebackground="#fffae6")
 	title.place(x=0, y=0, width=500, height=75)
 
@@ -74,8 +78,11 @@ if __name__ == '__main__':
 	restart_lbl = Label(root, image=restart_image, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
 	restart_lbl.place(x=0, y=0, width=40, height=40)
 
-	drawing_lbl = Label(root, justify=CENTER, borderwidth=0, background="green", activebackground="#fffae6", highlightthickness=0)
-	drawing_lbl.place(x=0, y=150, width=200, height=250)
+	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="green")
+	word_canvas.place(x=0, y=100, width=500, height=100)
+
+	drawing_lbl = Label(root, image=hangman_images[8], justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
+	drawing_lbl.place(x=0, y=250, width=200, height=250)
 
 	root.mainloop()
 
