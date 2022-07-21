@@ -44,11 +44,15 @@ def change_gui_language(language):
 if __name__ == '__main__':
 	selected_language = "en"
 
+	with open("data/en_words.txt", "r", encoding="utf-8") as file1, open("data/hr_words.txt", "r", encoding="utf-8") as file2:
+		en_words = [i.rstrip("\n") for i in file1.readlines()]
+		hr_words = [i.rstrip("\n") for i in file2.readlines()]
+
 	root = Tk()
 	root.title("Hangman")
 	root.resizable(False, False)
 	root.geometry(f"500x500+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 250}")
-	root.iconbitmap(resource_path("hangman-icon.ico"))
+	root.iconbitmap(resource_path("images/hangman-icon.ico"))
 	root.config(background="#fffae6")
 
 	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), borderwidth=0, background="#fffae6", activebackground="#fffae6")
@@ -66,9 +70,12 @@ if __name__ == '__main__':
 	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
 	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
 
-	restart_image = PhotoImage(file="hangman-restart_image2.png")
+	restart_image = PhotoImage(file="images/hangman-restart_image.png")
 	restart_lbl = Label(root, image=restart_image, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
 	restart_lbl.place(x=0, y=0, width=40, height=40)
+
+	drawing_lbl = Label(root, justify=CENTER, borderwidth=0, background="green", activebackground="#fffae6", highlightthickness=0)
+	drawing_lbl.place(x=0, y=150, width=200, height=250)
 
 	root.mainloop()
 
