@@ -1,6 +1,7 @@
 from tkinter import *
 import os
 import sys
+import random
 
 
 def resource_path(relative_path):
@@ -64,6 +65,10 @@ if __name__ == '__main__':
 	hr_lbl.bind("<Enter>", lambda event: change_language_thickness(event, hr_lbl, False, "hr", selected_language))
 	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
 	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
+
+	restart_image = PhotoImage(file="hangman-restart_image2.png")
+	restart_lbl = Label(root, image=restart_image, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
+	restart_lbl.place(x=0, y=0, width=40, height=40)
 
 	root.mainloop()
 
