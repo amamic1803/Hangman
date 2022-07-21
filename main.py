@@ -12,8 +12,37 @@ def resource_path(relative_path):
 		base_path = os.path.abspath(".")
 	return os.path.join(base_path, relative_path)
 
+def change_language(event, language):
+	global selected_language
+	if selected_language != language:
+		if language == "en":
+			en_lbl.config(highlightthickness=2)
+			hr_lbl.config(highlightthickness=0)
+		else:
+			en_lbl.config(highlightthickness=0)
+			hr_lbl.config(highlightthickness=2)
+		selected_language = language
+		change_gui_language(selected_language)
+
+def change_language_thickness(event, widget, typ, language, selected_language):
+	if language != selected_language:
+		if typ:
+			widget.config(highlightthickness=0)
+		else:
+			widget.config(highlightthickness=4)
+
+def change_gui_language(language):
+	if language == "en":
+		root.title("Hangman")
+		title.config(text="Hangman")
+	else:
+		root.title("Vješala")
+		title.config(text="Vješala")
+
 
 if __name__ == '__main__':
+	selected_language = "en"
+
 	root = Tk()
 	root.title("Hangman")
 	root.resizable(False, False)
@@ -21,14 +50,20 @@ if __name__ == '__main__':
 	root.iconbitmap(resource_path("hangman-icon.ico"))
 	root.config(background="#fffae6")
 
-	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), background="#fffae6", activebackground="#fffae6")
+	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), borderwidth=0, background="#fffae6", activebackground="#fffae6")
 	title.place(x=0, y=0, width=500, height=75)
 
-	en_lbl = Label(root, text="EN", font=("Helvetica", 12, "bold"), justify=CENTER, background="#fffae6", activebackground="#fffae6", highlightthickness=2, highlightcolor="black", highlightbackground="black")
+	en_lbl = Label(root, text="EN", font=("Helvetica", 12, "bold"), justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=2, highlightcolor="black", highlightbackground="black")
 	en_lbl.place(x=430, y=0, width=35, height=25)
+	en_lbl.bind("<Enter>", lambda event: change_language_thickness(event, en_lbl, False, "en", selected_language))
+	en_lbl.bind("<Leave>", lambda event: change_language_thickness(event, en_lbl, True, "en", selected_language))
+	en_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "en"))
 
-	hr_lbl = Label(root, text="HR", font=("Helvetica", 12, "bold"), justify=CENTER, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	hr_lbl = Label(root, text="HR", font=("Helvetica", 12, "bold"), justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
 	hr_lbl.place(x=465, y=0, width=35, height=25)
+	hr_lbl.bind("<Enter>", lambda event: change_language_thickness(event, hr_lbl, False, "hr", selected_language))
+	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
+	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
 
 	root.mainloop()
 
