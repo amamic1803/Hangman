@@ -78,8 +78,20 @@ if __name__ == '__main__':
 	restart_lbl = Label(root, image=restart_image, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
 	restart_lbl.place(x=0, y=0, width=40, height=40)
 
-	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="green")
+	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="#fffae6")
 	word_canvas.place(x=0, y=100, width=500, height=100)
+
+	len_word = 10
+	start_coord = (500 - (len_word * 30 + (len_word - 1) * 11)) // 2
+	line_or_space = True
+	for i in range(2 * len_word - 1):
+		if line_or_space:
+			word_canvas.create_line(start_coord, 50, start_coord + 30, 50, fill="black", width=3)
+			line_or_space = False
+			start_coord += 30
+		else:
+			start_coord += 11
+			line_or_space = True
 
 	drawing_lbl = Label(root, image=hangman_images[8], justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
 	drawing_lbl.place(x=0, y=250, width=200, height=250)
