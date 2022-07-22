@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.messagebox import showwarning
 import os
 import sys
 import random
@@ -36,13 +37,56 @@ def change_gui_language(language):
 	if language == "en":
 		root.title("Hangman")
 		title.config(text="Hangman")
+		guess_btn.config(text="Try")
 	else:
 		root.title("Vješala")
 		title.config(text="Vješala")
+		guess_btn.config(text="Probaj")
+
+def change_thickness(event, widget, typ):
+	if typ:
+		widget.config(highlightthickness=3)
+	else:
+		widget.config(highlightthickness=5)
+
+def start_game():
+	global selected_language, en_words, hr_words, letter_coords, word
+	word_canvas.delete("all")
+	letter_coords = []
+	if selected_language == "en":
+		word = random.choice(en_words)
+		len_word = len(word)
+		start_coord = (500 - (len_word * 30 + (len_word - 1) * 11)) // 2
+		line_or_space = True
+		for i in range(2 * len_word - 1):
+			if line_or_space:
+				word_canvas.create_line(start_coord, 40, start_coord + 30, 40, fill="black", width=4)
+				letter_coords.append(start_coord + 14)
+				line_or_space = False
+				start_coord += 30
+			else:
+				start_coord += 11
+				line_or_space = True
+	else:
+		word = random.choice(hr_words)
+
+def validate_input(full_text):
+	global word
+	if full_text == "":
+		return True
+	elif full_text.isalpha() and len(full_text) <= len(word):
+		return True
+	else:
+		return False
+
+def guess_click(event):
+	pass
 
 
 if __name__ == '__main__':
 	selected_language = "en"
+	letter_coords = []
+	word = ""
 
 	with open("data/en_words.txt", "r", encoding="utf-8") as file1, open("data/hr_words.txt", "r", encoding="utf-8") as file2:
 		en_words = [i.rstrip("\n") for i in file1.readlines()]
@@ -51,7 +95,7 @@ if __name__ == '__main__':
 	root = Tk()
 	root.title("Hangman")
 	root.resizable(False, False)
-	root.geometry(f"500x500+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 250}")
+	root.geometry(f"500x425+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 212}")
 	root.iconbitmap(resource_path("images/hangman-icon.ico"))
 	root.config(background="#fffae6")
 
@@ -79,22 +123,24 @@ if __name__ == '__main__':
 	restart_lbl.place(x=0, y=0, width=40, height=40)
 
 	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="#fffae6")
-	word_canvas.place(x=0, y=100, width=500, height=100)
+	word_canvas.place(x=0, y=100, width=500, height=50)
 
-	len_word = 10
-	start_coord = (500 - (len_word * 30 + (len_word - 1) * 11)) // 2
-	line_or_space = True
-	for i in range(2 * len_word - 1):
-		if line_or_space:
-			word_canvas.create_line(start_coord, 50, start_coord + 30, 50, fill="black", width=3)
-			line_or_space = False
-			start_coord += 30
-		else:
-			start_coord += 11
-			line_or_space = True
+	start_game()
 
-	drawing_lbl = Label(root, image=hangman_images[8], justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
-	drawing_lbl.place(x=0, y=250, width=200, height=250)
+	word_canvas.create_text(64, 40, text="DŽ", font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
+
+	drawing_lbl = Label(root, image=hangman_images[8], justify=CENTER, borderwidth=0, background="green", activebackground="#fffae6", highlightthickness=0)
+	drawing_lbl.place(x=0, y=175, width=200, height=250)
+
+	reg = root.register(validate_input)
+	guess_ent = Entry(root, justify=CENTER, validate="key", validatecommand=(reg, "%P"), background="#ffffff", foreground="#000000", highlightthickness=3, highlightcolor="black", highlightbackground="black", borderwidth=0, font=("Helvetica", 15))
+	guess_ent.place(x=250, y=200, width=173, height=35)
+
+	guess_btn = Label(root, text="Try", font=("Helvetica", 15, "bold"), justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=3, highlightcolor="black", highlightbackground="black")
+	guess_btn.place(x=420, y=200, width=80, height=35)
+	guess_btn.bind("<Enter>", lambda event: change_thickness(event, guess_btn, False))
+	guess_btn.bind("<Leave>", lambda event: change_thickness(event, guess_btn, True))
+	guess_btn.bind("<ButtonRelease-1>", lambda event: guess_click(event))
 
 	root.mainloop()
 
