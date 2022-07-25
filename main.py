@@ -50,9 +50,12 @@ def change_thickness(event, widget, typ):
 		widget.config(highlightthickness=5)
 
 def start_game(event=None):
-	global selected_language, en_words, hr_words, letter_coords, word, word_letters
+	global selected_language, en_words, hr_words, letter_coords, word, word_letters, guessed_letters, missed_letters
 	word_canvas.delete("all")
 	letter_coords = []
+	word_letters = []
+	guessed_letters = []
+	missed_letters = []
 	if selected_language == "en":
 		word = random.choice(en_words)
 		word_letters = [x for x in word]
@@ -70,8 +73,6 @@ def start_game(event=None):
 				line_or_space = True
 	else:
 		word = random.choice(hr_words)
-
-		word_letters = []
 		word_temp = word
 		while len(word_temp) > 0:
 			if len(word_temp) == 1:
@@ -107,26 +108,29 @@ def validate_input(full_text):
 		return False
 
 def guess_click(event):
-	global word, word_letters
-	inpt = guess_ent.get()
+	global word, word_letters, letter_coords, guessed_letters, missed_letters
+	inpt = guess_ent.get().upper()
 	if len(inpt) != 0:
-		if inpt in word_letters or inpt == word:
+		if inpt in word_letters:
 			guessed_letters.append(inpt)
+			for i in range(len(word_letters)):
+				if word_letters[i] == inpt:
+					word_canvas.create_text(letter_coords[i], 40, text=inpt, font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
+		elif inpt == word:
+			for i in range(len(word_letters)):
+				if word_letters[i] not in guessed_letters:
+					word_canvas.create_text(letter_coords[i], 40, text=word_letters[i], font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
+					guessed_letters.append(word_letters[i])
 		else:
 			missed_letters.append(inpt)
 
 
 if __name__ == '__main__':
 	selected_language = "en"
-	letter_coords = []
-	word = ""
-	word_letters = []
-	guessed_letters = []
-	missed_letters = []
 
 	with open("data/en_words.txt", "r", encoding="utf-8") as file1, open("data/hr_words.txt", "r", encoding="utf-8") as file2:
-		en_words = [i.rstrip("\n") for i in file1.readlines()]
-		hr_words = [i.rstrip("\n") for i in file2.readlines()]
+		en_words = [i.rstrip("\n").upper() for i in file1.readlines()]
+		hr_words = [i.rstrip("\n").upper() for i in file2.readlines()]
 
 	root = Tk()
 	root.title("Hangman")
@@ -161,8 +165,6 @@ if __name__ == '__main__':
 
 	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="#fffae6")
 	word_canvas.place(x=0, y=100, width=500, height=50)
-
-	# word_canvas.create_text(64, 40, text="DŽ", font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
 
 	drawing_lbl = Label(root, image="", justify=CENTER, borderwidth=0, background="green", activebackground="#fffae6", highlightthickness=0)
 	drawing_lbl.place(x=0, y=175, width=200, height=250)
