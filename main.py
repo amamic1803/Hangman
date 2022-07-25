@@ -38,10 +38,12 @@ def change_gui_language(language):
 		root.title("Hangman")
 		title.config(text="Hangman")
 		guess_btn.config(text="Try")
+		missed_guesses_title.config(text=" Missed:")
 	else:
 		root.title("Vješala")
 		title.config(text="Vješala")
 		guess_btn.config(text="Probaj")
+		missed_guesses_title.config(text=" Promašaji:")
 
 def change_thickness(event, widget, typ):
 	if typ:
@@ -50,12 +52,14 @@ def change_thickness(event, widget, typ):
 		widget.config(highlightthickness=5)
 
 def start_game(event=None):
-	global selected_language, en_words, hr_words, letter_coords, word, word_letters, guessed_letters, missed_letters
+	global selected_language, en_words, hr_words, letter_coords, word, word_letters, guessed_letters, missed_letters, ended
 	word_canvas.delete("all")
+	missed_guesses.config(text="")
 	letter_coords = []
 	word_letters = []
 	guessed_letters = []
 	missed_letters = []
+	ended = False
 	if selected_language == "en":
 		word = random.choice(en_words)
 		word_letters = [x for x in word]
@@ -102,27 +106,37 @@ def validate_input(full_text):
 	global word
 	if full_text == "":
 		return True
-	elif full_text.isalpha() and len(full_text) <= len(word):
+	elif full_text.isalpha() and len(full_text) <= 11:
 		return True
 	else:
 		return False
 
 def guess_click(event):
-	global word, word_letters, letter_coords, guessed_letters, missed_letters
+	global word, word_letters, letter_coords, guessed_letters, missed_letters, ended, hangman_images
 	inpt = guess_ent.get().upper()
+	guess_ent.delete(0, END)
 	if len(inpt) != 0:
-		if inpt in word_letters:
+		if inpt in word_letters and inpt not in guessed_letters:
 			guessed_letters.append(inpt)
+			to_end = True
 			for i in range(len(word_letters)):
 				if word_letters[i] == inpt:
 					word_canvas.create_text(letter_coords[i], 40, text=inpt, font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
-		elif inpt == word:
+				if word_letters[i] not in guessed_letters:
+					to_end = False
+			ended = to_end
+		elif inpt == word and not ended:
 			for i in range(len(word_letters)):
 				if word_letters[i] not in guessed_letters:
 					word_canvas.create_text(letter_coords[i], 40, text=word_letters[i], font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
 					guessed_letters.append(word_letters[i])
-		else:
+			ended = True
+		elif not ended:
 			missed_letters.append(inpt)
+			missed_guesses.config(text="\n".join(missed_letters))
+			drawing_lbl.config(image=hangman_images[len(missed_letters) - 1])
+			if len(missed_letters) == 9:
+				ended = True
 
 
 if __name__ == '__main__':
@@ -166,7 +180,7 @@ if __name__ == '__main__':
 	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="#fffae6")
 	word_canvas.place(x=0, y=100, width=500, height=50)
 
-	drawing_lbl = Label(root, image="", justify=CENTER, borderwidth=0, background="green", activebackground="#fffae6", highlightthickness=0)
+	drawing_lbl = Label(root, image="", justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
 	drawing_lbl.place(x=0, y=175, width=200, height=250)
 
 	reg = root.register(validate_input)
@@ -178,6 +192,16 @@ if __name__ == '__main__':
 	guess_btn.bind("<Enter>", lambda event: change_thickness(event, guess_btn, False))
 	guess_btn.bind("<Leave>", lambda event: change_thickness(event, guess_btn, True))
 	guess_btn.bind("<ButtonRelease-1>", lambda event: guess_click(event))
+	root.bind("<KeyRelease-Return>", lambda event: guess_click(event))
+
+	missed_guesses_title = Label(root, text=" Misses:", font=("Helvetica", 12, "bold"), anchor="w", justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	missed_guesses_title.place(x=250, y=230, width=250, height=25)
+
+	missed_guesses = Label(root, text="", font=("Helvetica", 12, "bold"), anchor="n", justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	missed_guesses.place(x=250, y=255, width=250, height=170)
+
+	end_status_lbl = Label(root, text="Fail!", font=("Helvetica", 20, "bold"), anchor=CENTER, justify=CENTER, borderwidth=0, foreground="red", activeforeground="red", background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	end_status_lbl.place(x=0, y=143, width=500, height=51)
 
 	start_game()
 
