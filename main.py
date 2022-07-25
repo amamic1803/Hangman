@@ -17,14 +17,22 @@ def resource_path(relative_path):
 def change_language(event, language):
 	global selected_language
 	if selected_language != language:
-		if language == "en":
-			en_lbl.config(highlightthickness=2)
-			hr_lbl.config(highlightthickness=0)
-		else:
-			en_lbl.config(highlightthickness=0)
-			hr_lbl.config(highlightthickness=2)
+		selected_language_temp = selected_language
 		selected_language = language
-		change_gui_language(selected_language)
+		if start_game():
+			if language == "en":
+				en_lbl.config(highlightthickness=2)
+				hr_lbl.config(highlightthickness=0)
+			else:
+				en_lbl.config(highlightthickness=0)
+				hr_lbl.config(highlightthickness=2)
+			change_gui_language(selected_language)
+		else:
+			selected_language = selected_language_temp
+			if language == "en":
+				en_lbl.config(highlightthickness=0)
+			else:
+				hr_lbl.config(highlightthickness=0)
 
 def change_language_thickness(event, widget, typ, language, selected_language):
 	if language != selected_language:
@@ -59,8 +67,18 @@ def restart_change(event, typ):
 
 def start_game(event=None):
 	global selected_language, en_words, hr_words, letter_coords, word, word_letters, guessed_letters, missed_letters, ended
+	restart_lbl.config(image=restart_image_smaller)
+	if not ended and (len(guessed_letters) > 0 or len(missed_letters) > 0):
+		if selected_language == "en":
+			end_game = askyesno("Game in progress!", "Are you sure you want to start a new game?")
+		else:
+			end_game = askyesno("Igra u tijeku!", "Jeste li sigurni da želite pokrenuti novu igru?")
+		if not end_game:
+			return False
 	word_canvas.delete("all")
 	missed_guesses.config(text="")
+	end_status_lbl.config(text="")
+	drawing_lbl.config(image="")
 	letter_coords = []
 	word_letters = []
 	guessed_letters = []
@@ -88,13 +106,12 @@ def start_game(event=None):
 			if len(word_temp) == 1:
 				word_letters.append(word_temp)
 				word_temp = ""
-			elif word_temp[0] + word_temp[1] in ["dž", "nj", "lj"]:
-				word_letters.append(word_temp[0] + word_temp[1])
+			elif word_temp[0:2] in ["DŽ", "NJ", "LJ"]:
+				word_letters.append(word_temp[0:2])
 				word_temp = word_temp[2:]
 			else:
 				word_letters.append(word_temp[0])
 				word_temp = word_temp[1:]
-
 		len_word = len(word_letters)
 		start_coord = (500 - (len_word * 30 + (len_word - 1) * 11)) // 2
 		line_or_space = True
@@ -107,6 +124,7 @@ def start_game(event=None):
 			else:
 				start_coord += 11
 				line_or_space = True
+	return True
 
 def validate_input(full_text):
 	global word
@@ -118,7 +136,7 @@ def validate_input(full_text):
 		return False
 
 def guess_click(event):
-	global word, word_letters, letter_coords, guessed_letters, missed_letters, ended, hangman_images
+	global word, word_letters, letter_coords, guessed_letters, missed_letters, ended, hangman_images, selected_language
 	inpt = guess_ent.get().upper()
 	guess_ent.delete(0, END)
 	if len(inpt) != 0:
@@ -130,25 +148,43 @@ def guess_click(event):
 					word_canvas.create_text(letter_coords[i], 40, text=inpt, font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
 				if word_letters[i] not in guessed_letters:
 					to_end = False
-			ended = to_end
+			if to_end:
+				ended = True
+				if selected_language == "en":
+					end_status_lbl.config(text="Victory!", foreground="green", activeforeground="green")
+				else:
+					end_status_lbl.config(text="Pobjeda!", foreground="green", activeforeground="green")
 		elif inpt == word and not ended:
 			for i in range(len(word_letters)):
 				if word_letters[i] not in guessed_letters:
 					word_canvas.create_text(letter_coords[i], 40, text=word_letters[i], font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
-					guessed_letters.append(word_letters[i])
 			ended = True
+			if selected_language == "en":
+				end_status_lbl.config(text="Victory!", foreground="green", activeforeground="green")
+			else:
+				end_status_lbl.config(text="Pobjeda!", foreground="green", activeforeground="green")
 		elif not ended:
 			missed_letters.append(inpt)
 			missed_guesses.config(text="\n".join(missed_letters))
 			drawing_lbl.config(image=hangman_images[len(missed_letters) - 1])
 			if len(missed_letters) == 9:
 				ended = True
+				if selected_language == "en":
+					end_status_lbl.config(text="Fail!", foreground="red", activeforeground="red")
+				else:
+					end_status_lbl.config(text="Poraz!", foreground="red", activeforeground="red")
+				for i in range(len(word_letters)):
+					if word_letters[i] not in guessed_letters:
+						word_canvas.create_text(letter_coords[i], 40, text=word_letters[i], font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
 
 
 if __name__ == '__main__':
 	selected_language = "en"
+	ended = True
+	guessed_letters = []
+	missed_letters = []
 
-	with open("data/en_words.txt", "r", encoding="utf-8") as file1, open("data/hr_words.txt", "r", encoding="utf-8") as file2:
+	with open(resource_path("data/en_words.txt"), "r", encoding="utf-8") as file1, open(resource_path("data/hr_words.txt"), "r", encoding="utf-8") as file2:
 		en_words = [i.rstrip("\n").upper() for i in file1.readlines()]
 		hr_words = [i.rstrip("\n").upper() for i in file2.readlines()]
 
@@ -161,7 +197,7 @@ if __name__ == '__main__':
 
 	hangman_images = []
 	for i in range(1, 10):
-		hangman_images.append(PhotoImage(file=f"images//hangman_{i}.png"))
+		hangman_images.append(PhotoImage(file=resource_path(f"images//hangman_{i}.png")))
 
 	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), borderwidth=0, background="#fffae6", activebackground="#fffae6")
 	title.place(x=0, y=0, width=500, height=75)
@@ -178,8 +214,8 @@ if __name__ == '__main__':
 	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
 	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
 
-	restart_image_smaller = PhotoImage(file="images/hangman-restart_smaller.png")
-	restart_image_bigger = PhotoImage(file="images/hangman-restart_bigger.png")
+	restart_image_smaller = PhotoImage(file=resource_path("images/hangman-restart_smaller.png"))
+	restart_image_bigger = PhotoImage(file=resource_path("images/hangman-restart_bigger.png"))
 	restart_lbl = Label(root, image=restart_image_smaller, anchor=CENTER, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightbackground="#fffae6", highlightthickness=0)
 	restart_lbl.place(x=0, y=0, width=45, height=45)
 	restart_lbl.bind("<ButtonRelease-1>", start_game)
@@ -209,7 +245,7 @@ if __name__ == '__main__':
 	missed_guesses = Label(root, text="", font=("Helvetica", 12, "bold"), anchor="n", justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
 	missed_guesses.place(x=250, y=255, width=250, height=170)
 
-	end_status_lbl = Label(root, text="Fail!", font=("Helvetica", 20, "bold"), anchor=CENTER, justify=CENTER, borderwidth=0, foreground="red", activeforeground="red", background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
+	end_status_lbl = Label(root, text="", font=("Helvetica", 20, "bold"), anchor=CENTER, justify=CENTER, borderwidth=0, foreground="green", activeforeground="green", background="#fffae6", activebackground="#fffae6", highlightthickness=0, highlightcolor="black", highlightbackground="black")
 	end_status_lbl.place(x=0, y=143, width=500, height=51)
 
 	start_game()
