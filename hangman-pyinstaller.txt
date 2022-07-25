@@ -1,0 +1,15 @@
+Generate .SPEC file:
+pyi-makespec "main.py" --noconsole --icon "images/hangman-icon.ico" --onefile --key "__key__" --name "Hangman-v1"
+
+
+Edit .SPEC file:
+- original:   "a.binaries,
+               a.zipfiles,"
+- edited:     "a.binaries,
+               Tree("images", prefix="images\\"),
+               Tree("data", prefix="data\\"),
+               a.zipfiles,"
+
+
+Generate executable:
+pyinstaller "Hangman-v1.spec" --upx-dir "__upx_dir__" --clean
