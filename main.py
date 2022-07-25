@@ -51,6 +51,12 @@ def change_thickness(event, widget, typ):
 	else:
 		widget.config(highlightthickness=5)
 
+def restart_change(event, typ):
+	if typ:
+		restart_lbl.config(image=restart_image_smaller)
+	else:
+		restart_lbl.config(image=restart_image_bigger)
+
 def start_game(event=None):
 	global selected_language, en_words, hr_words, letter_coords, word, word_letters, guessed_letters, missed_letters, ended
 	word_canvas.delete("all")
@@ -172,10 +178,13 @@ if __name__ == '__main__':
 	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
 	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
 
-	restart_image = PhotoImage(file="images/hangman-restart_image.png")
-	restart_lbl = Label(root, image=restart_image, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightthickness=0)
-	restart_lbl.place(x=0, y=0, width=40, height=40)
+	restart_image_smaller = PhotoImage(file="images/hangman-restart_smaller.png")
+	restart_image_bigger = PhotoImage(file="images/hangman-restart_bigger.png")
+	restart_lbl = Label(root, image=restart_image_smaller, anchor=CENTER, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightbackground="#fffae6", highlightthickness=0)
+	restart_lbl.place(x=0, y=0, width=45, height=45)
 	restart_lbl.bind("<ButtonRelease-1>", start_game)
+	restart_lbl.bind("<Enter>", lambda event: restart_change(event, False))
+	restart_lbl.bind("<Leave>", lambda event: restart_change(event, True))
 
 	word_canvas = Canvas(root, borderwidth=0, highlightthickness=0, background="#fffae6")
 	word_canvas.place(x=0, y=100, width=500, height=50)
