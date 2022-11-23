@@ -1,8 +1,8 @@
+import os
+import random
+import sys
 from tkinter import *
 from tkinter.messagebox import askyesno
-import os
-import sys
-import random
 
 
 def resource_path(relative_path):
@@ -177,14 +177,30 @@ def guess_click(event):
 					if word_letters[i] not in guessed_letters:
 						word_canvas.create_text(letter_coords[i], 40, text=word_letters[i], font=("Helvetica", 21, "bold"), fill="black", activefill="black", anchor="s")
 
+def main():
+	global guessed_letters, missed_letters
+	global root
+	global title
+	global guess_btn, missed_guesses_title
+	global en_lbl, hr_lbl
+	global restart_lbl, restart_image_smaller, restart_image_bigger
+	global word_canvas
+	global missed_guesses
+	global end_status_lbl
+	global drawing_lbl
+	global guess_ent
+	global selected_language
+	global en_words, hr_words
+	global letter_coords, word, word_letters
+	global ended
+	global hangman_images
 
-if __name__ == '__main__':
 	selected_language = "en"
 	ended = True
 	guessed_letters = []
 	missed_letters = []
 
-	with open(resource_path("data/en_words.txt"), "r", encoding="utf-8") as file1, open(resource_path("data/hr_words.txt"), "r", encoding="utf-8") as file2:
+	with open(resource_path("run_data/words/en_words.txt"), "r", encoding="utf-8") as file1, open(resource_path("run_data/words/hr_words.txt"), "r", encoding="utf-8") as file2:
 		en_words = [i.rstrip("\n").upper() for i in file1.readlines()]
 		hr_words = [i.rstrip("\n").upper() for i in file2.readlines()]
 
@@ -192,12 +208,12 @@ if __name__ == '__main__':
 	root.title("Hangman")
 	root.resizable(False, False)
 	root.geometry(f"500x425+{root.winfo_screenwidth() // 2 - 250}+{root.winfo_screenheight() // 2 - 212}")
-	root.iconbitmap(resource_path("images/hangman-icon.ico"))
+	root.iconbitmap(resource_path("data/hangman-icon.ico"))
 	root.config(background="#fffae6")
 
 	hangman_images = []
 	for i in range(1, 10):
-		hangman_images.append(PhotoImage(file=resource_path(f"images//hangman_{i}.png")))
+		hangman_images.append(PhotoImage(file=resource_path(f"run_data/images//hangman_{i}.png")))
 
 	title = Label(root, text="Hangman", font=("Gabriola", 40, "bold"), borderwidth=0, background="#fffae6", activebackground="#fffae6")
 	title.place(x=0, y=0, width=500, height=75)
@@ -214,8 +230,8 @@ if __name__ == '__main__':
 	hr_lbl.bind("<Leave>", lambda event: change_language_thickness(event, hr_lbl, True, "hr", selected_language))
 	hr_lbl.bind("<ButtonRelease-1>", lambda event: change_language(event, "hr"))
 
-	restart_image_smaller = PhotoImage(file=resource_path("images/hangman-restart_smaller.png"))
-	restart_image_bigger = PhotoImage(file=resource_path("images/hangman-restart_bigger.png"))
+	restart_image_smaller = PhotoImage(file=resource_path("run_data/images/hangman-restart_smaller.png"))
+	restart_image_bigger = PhotoImage(file=resource_path("run_data/images/hangman-restart_bigger.png"))
 	restart_lbl = Label(root, image=restart_image_smaller, anchor=CENTER, justify=CENTER, borderwidth=0, background="#fffae6", activebackground="#fffae6", highlightbackground="#fffae6", highlightthickness=0)
 	restart_lbl.place(x=0, y=0, width=45, height=45)
 	restart_lbl.bind("<ButtonRelease-1>", start_game)
@@ -251,3 +267,7 @@ if __name__ == '__main__':
 	start_game()
 
 	root.mainloop()
+
+
+if __name__ == '__main__':
+	main()
