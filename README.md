@@ -1,6 +1,6 @@
 # Hangman
 
-A Hangman game
+Hangman game
 (English / Croatian)
 
 ![screenshot](https://user-images.githubusercontent.com/40371578/180794033-47abc328-3457-4956-80fb-976284bcb18c.png)
@@ -10,6 +10,8 @@ Prebuilt program is available under Releases
 
 ## Building
 1. Clone repository
-2. Run command: `pip install -r requirements.txt`
-3. Run build.py
-4. Built `*.exe` will be placed in the same folder
+2. Install Python
+3. Install dependencies: `pip install -r requirements.txt`
+4. Install UPX (optional)
+5. Run build.py
+6. Built `*.exe` will be placed in the same folder
